@@ -53,6 +53,29 @@ function Create(props) {
   </article>
 }
 
+function Update(props) {
+  const [title, setTitle] = useState(props.title);
+  const [body, setBody] = useState(props.body);
+  return <article>
+    <h2>Update</h2>
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      const title = e.target.title.value;
+      const body = e.target.body.value;
+      props.onUpdate(title, body);
+    }}>
+      <p><input type="text" name="title" placeholder="title" value={title} onChange={(e) => {
+        setTitle(e.target.value);
+      }}/></p>
+      <p><textarea name="body" placeholder="body" value={body} onChange={(e) => {
+        setBody(e.target.value);
+      }}></textarea></p>
+      <p><input type="submit" value="Update"/></p>
+    </form>
+    <h2>Create</h2>
+  </article>
+}
+
 function App() {
   const [mode, setMode] = useState("WELCOME");
   const [id, setId] = useState(null);
@@ -64,10 +87,15 @@ function App() {
   ]);
 
   let content = null;
+  let contextControl = null;
   if (mode === "WELCOME") {
     content = <Article title="Welcome" body="Hello, WEB!"></Article>
   } else if (mode === "READ") {
     content = <Article title={topics[id].title} body={topics[id].body}></Article>
+    contextControl = <li><a href={"/update/"+id} onClick={(e) => {
+      e.preventDefault();
+      setMode("UPDATE");
+    }}>Update</a></li>
   } else if (mode === "CREATE") {
     content = <Create onCreate={(title, body) => {
       const newTopic = {id: nextId, title: title, body: body};
@@ -78,6 +106,14 @@ function App() {
       setId(nextId);
       setNextId(nextId+1);
     }}></Create>
+  } else if (mode === "UPDATE") {
+    content = <Update title={topics[id].title} body={topics[id].body} onUpdate={ (title, body) => {
+    const newTopics = [...topics];
+    const updatedTopic = {id: topics[id].id, title: title, body: body}
+    newTopics[topics[id].id] = updatedTopic;
+    setTopics(newTopics);
+    setMode("READ");
+    }}></Update>
   }
 
   return (
@@ -90,10 +126,14 @@ function App() {
         setId(id);
       }}></Nav>
       {content}
-      <a href="/create" onClick={(e) => {
-        e.preventDefault();
-        setMode("CREATE");
-      }}>Create</a>
+      <ul>
+        <li><a href="/create" onClick={(e) => {
+            e.preventDefault();
+            setMode("CREATE");
+          }}>Create</a></li>
+          {contextControl}
+      </ul>
+      
     </div>
   );
 }
