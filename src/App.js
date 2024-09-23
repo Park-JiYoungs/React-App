@@ -100,9 +100,7 @@ function App() {
       <li><input type="button" value="Delete" onClick={(e) => {
         const newTopics = [];
         for (let i=0; i<topics.length; i++) {
-          if (topics[i].id !== id) {
-            newTopics.push(topics[i]);
-          }
+          if (topics[i].id !== id) newTopics.push(topics[i]);
           setTopics(newTopics);
           setMode("WELCOME");
         }
